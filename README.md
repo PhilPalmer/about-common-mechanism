@@ -4,5 +4,5 @@
 ```bash
 conda activate about-common-mechanism
 
-Rscript -e "rmarkdown::render('presentation.Rmd', output_file='handout.pdf')"
+Rscript -e "rmarkdown::render('presentation.Rmd', output_file='presentation_handout.pdf')"
 ```

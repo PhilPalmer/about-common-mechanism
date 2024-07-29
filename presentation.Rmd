@@ -134,7 +134,7 @@ As of 2022, at least 57 DNA synthesis companies existed globally, with nearly ha
 Additionally, there are several software methods available to DNA synthesis providers to screen DNA sequences for pathogens and toxins, as shown in Table \ref{tab:screening_methods} [@frank_evaluation_2024].
 
 <!--
-```{r, echo=FALSE, out.width="70%", fig.cap="Number of DNA Synthesis Companies per Country (Data from Delaney 2022)"}
+```{r, echo=FALSE, out.width="70%", fig.cap="Number of DNA Synthesis Companies per Country (Data from Delaney and Pálya 2022)"}
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)
@@ -179,7 +179,7 @@ ggsave("images/dna_synthesis_companies.png")
 \begin{minipage}{0.47\textwidth}
 \centering
 \includegraphics[width=\linewidth]{images/dna_synthesis_companies.png}
-\captionof{figure}{Number of DNA Synthesis Companies per Country (Data from Delaney 2022).}
+\captionof{figure}{Number of DNA Synthesis Companies per Country (Data from Delaney and Pálya 2022).}
 \label{fig:dna_synthesis_companies}
 \end{minipage}
 \hfill
@@ -320,7 +320,7 @@ In other words, we should **focus on increasing the adoption of the Common Mecha
 
 Strategies to achieve this could include:
 
-1. **Awareness**: Identify companies not performing screening (there are 31 such companies according to Delaney 2022) and conduct targeted outreach about the Common Mechanism and its benefits.
+1. **Awareness**: Identify companies not performing screening (there are 31 such companies according to Delaney and Pálya 2022) and conduct targeted outreach about the Common Mechanism and its benefits.
 2. **Documentation**: Refine and improve implementation guides to facilitate easier adoption.
 3. **Training**: Provide workshops on implementing the Common Mechanism.
 4. **Support**: Offer technical assistance to companies during implementation.
