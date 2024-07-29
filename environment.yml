@@ -1,0 +1,19 @@
+name: about-common-mechanism
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - r-base
+  - r-essentials
+  - r-tidyverse
+  - r-rmarkdown
+  - r-ggplot2
+  - r-knitr
+  - r-tufte
+  - r-bookdown
+  - tinytex
+
+# Run additional commands after creating the environment
+post-build:
+  - Rscript -e "tinytex::install_tinytex()"
+  - Rscript -e "tinytex::tlmgr_install('bookmark')"
