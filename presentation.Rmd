@@ -1,5 +1,5 @@
 ---
-title: "Understanding the Common Mechanism and A Suggestion for Improvement"
+title: "Understanding The Common Mechanism And A Suggestion For Improvement"
 author: "Phil Palmer"
 date: "31st July 2023"
 output:
@@ -133,8 +133,8 @@ Screening DNA synthesis orders to prevent harmful or dangerous sequence synthesi
 As of 2022, at least 57 DNA synthesis companies existed globally, with nearly half being International Gene Synthesis Consortium (IGSC) members, performing voluntary DNA sequence screening, as shown in Figure \ref{fig:dna_synthesis_companies} [@delaney_airtable_2022].^[A common statistic suggests 80% of DNA synthesis orders are screened. While hard evidence for this figure is lacking, it seems reasonable given that the IGSC represents the 10 largest DNA synthesis companies [@williams_preventing_2023].]
 Additionally, there are several software methods available to DNA synthesis providers to screen DNA sequences for pathogens and toxins, as shown in Table \ref{tab:screening_methods} [@frank_evaluation_2024].
 
-<!--
-```{r, echo=FALSE, out.width="70%", fig.cap="Number of DNA Synthesis Companies per Country (Data from Delaney and Pálya 2022)"}
+
+```{r, echo=FALSE, eval=FALSE, out.width="70%", fig.cap="Number of DNA Synthesis Companies per Country (Data from Delaney and Pálya 2022)"}
 library(ggplot2)
 library(dplyr)
 library(RColorBrewer)
@@ -144,37 +144,36 @@ dna_synthesis_companies_csv <- "data/dna_synthesis_companies.csv"
 dna_companies <- read.csv(dna_synthesis_companies_csv)
 
 # Get the % of companies that are members of the IGSC (where "screening" == "IGSC")
-# igsc_membership <- dna_synthesis_companies %>%
-#     count(Screening) %>%
-#     mutate(percentage = n / sum(n) * 100)
-# igsc_membership
+igsc_membership <- dna_companies %>%
+    count(Screening) %>%
+    mutate(percentage = n / sum(n) * 100)
+print(igsc_membership)
 
 # Convert the Screening column to a binary variable indicating whether they screen or not
-dna_companies <- dna_companies %>%
-  mutate(Screening = ifelse(Screening == "No", "No", "Yes"))
+# dna_companies <- dna_companies %>%
+#   mutate(Screening = ifelse(Screening == "No", "No", "Yes"))
 
-# Summarize the number of companies per country and screening status
-country_summary <- dna_companies %>%
-  group_by(Country, Screening) %>%
-  summarise(CompanyCount = n(), .groups = 'drop') %>%
-  arrange(desc(CompanyCount))
+# # Summarize the number of companies per country and screening status
+# country_summary <- dna_companies %>%
+#   group_by(Country, Screening) %>%
+#   summarise(CompanyCount = n(), .groups = 'drop') %>%
+#   arrange(desc(CompanyCount))
 
-# Plot the number of companies per country with screening status
-ggplot(country_summary, aes(x = reorder(Country, -CompanyCount), y = CompanyCount, fill = Screening)) +
-  geom_bar(stat = 'identity') +
-  coord_flip() +
-  labs(title = '',
-       x = 'Country',
-       y = 'Number of Companies',
-       fill = 'Perform Screening') +
-  scale_fill_brewer(palette = "Set1") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
+# # Plot the number of companies per country with screening status
+# ggplot(country_summary, aes(x = reorder(Country, -CompanyCount), y = CompanyCount, fill = Screening)) +
+#   geom_bar(stat = 'identity') +
+#   coord_flip() +
+#   labs(title = '',
+#        x = 'Country',
+#        y = 'Number of Companies',
+#        fill = 'Perform Screening') +
+#   scale_fill_brewer(palette = "Set1") +
+#   theme_minimal() +
+#   theme(legend.position = "bottom")
 
-# Save the plot
-ggsave("images/dna_synthesis_companies.png")
+# # Save the plot
+# ggsave("images/dna_synthesis_companies.png")
 ```
--->
 
 \begin{minipage}{0.47\textwidth}
 \centering
@@ -294,19 +293,165 @@ Wheeler et al. 2024 suggested three areas for improving the Common Mechanism:
 \textbf{Suggestion} & \textbf{Example(s)} \\
 \midrule
 1. Expand beyond regulated pathogens and toxins & Expand the list of sequences of concern to include those not derived from regulated pathogens and toxins, as stated in the updated HHS Screening Framework. \\
-2. Update screening as science and policy develop & IBBIS could host and update sequence databases as new sequences of concern are identified or policies change. Respond to advances in deep learning methods that could evade screening or better identify sequences of concern. \\
+2. Update screening as science and policy develop & IBBIS could host and update sequence databases as new sequences of concern are identified or policies change. \\
+ & Respond to advances in deep learning methods that could evade screening or better identify sequences of concern. \\
 3. Limit information hazards from shared sequence databases & Consistent with the HHS Screening Framework, only share databases containing novel sequences of concern with trusted partners. \\
 \bottomrule
 \end{tabular}
 \caption{Suggestions for improving the Common Mechanism (Wheeler et al. 2024).}
 \end{table}
 
+## My Suggestion for Improvement
+
+Building upon the second suggestion, I propose **developing and incorporating an additional analysis module into the Common Mechanism to detect AI-generated sequences.**
+
+### Background
+
+AI models, such as those listed in Table \ref{tab:ai_models}, are increasingly used to design functional proteins with low sequence similarity to naturally occurring proteins [@wheeler_developing_2024].
+This presents a challenge for DNA synthesis screening, as AI-generated sequences may evade existing screening methods.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Model} & \textbf{Architecture} & \textbf{Modalities} \\
+\midrule
+ESM-3 & Transformer & Sequence, structure, function \\
+RF Diffusion & Diffusion & Sequence, structure \\
+EvoDiff & Diffusion & Sequence \\
+\bottomrule
+\end{tabular}
+\caption{Examples of widely used AI models for protein design.}
+\label{tab:ai_models}
+\end{table}
+
+The detection of AI-generated protein sequences, remains a nascent field with limited direct research available.
+Currently, we do not know if AI-generated sequences can be detected reliably.
+Here, I propose that methods from other domains, such as large language model (LLM) text detection, could be applied to this problem and the resulting method could be integrated into the Common Mechanism if successful.
+
+### Methods
+
+Detecting AI-generated sequences is essentially a binary classification task.
+Perhaps the most reliable current method for detecting AI-generated text is watermarking, where a unique signature is embedded in the generated text during the generation process [@kumarage_survey_2024].
+However, as this requires cooperation from AI developers, which may not always be feasible, I propose evaluating post-hoc detection methods based on the following two approaches:
+
+1. Feature-based approaches:
+    <!--
+    style, semantics and context 
+    -->
+    - Use a large dataset of labelled AI-generated and naturally occurring proteins to train a classifier to distinguish between the two.
+    - Learn features such as amino acid preferences, sequence motifs, or structural characteristics.
+    - Evaluate traditional machine learning algorithms and deep learning models, adapting techniques like TriFuseNet for protein sequences.
+
+2. LLM probability function approaches:
+    - Employ techniques like DetectGPT by introducing small changes to protein sequences and compare log probabilities using a pre-trained protein language model.
+    - This allows for the detection of AI-generated sequences without extensive training data by directly evaluating probability scores of original and perturbed sequences.
+   <!-- - Leverage cues from LLM probability functions, such as frequency bias
+   - Similar to DetectGPT, predict the likelihood 
+   - Employ techniques like DetectGPT, which examines curvatures in the LLM's log probability function.
+   - Utilise deep learning methods to mask tokens (amino acids) and predict their likelihood across the sequence.
+   - Employ techniques like DetectGPT, 
+   -->
+
+<!--
+1. Feature-based approaches:
+   - Stylometry analysis
+   - Structural examination
+   - Sequence characteristics
+
+2. LLM probability function:
+   - Utilise deep learning methods, such as LLMs, to mask tokens (amino acids) and predict their likelihood across the sequence
+   - Fine-tune existing LLMs for this specific task
+-->
+
+\begin{minipage}{0.5\textwidth}
+However, many challenges must be addressed:
+
+\begin{enumerate}
+    \item \textbf{Feasibility:} Determining the extent to which AI-generated and natural sequences can be distinguished (see Figure \ref{fig:esm3_sequences_umap}).
+    \item \textbf{Generalisability:} Ensuring the method works across different AI models
+    \item \textbf{Accuracy:} Minimising false positives and negatives
+    \item \textbf{Adaptability:} Keeping pace with new AI models
+    \item \textbf{Computational demands:} Managing the high computational cost of LLM inference and running this additional module
+\end{enumerate}
+\end{minipage}
+\hfill
+\begin{minipage}{0.47\textwidth}
+\centering
+\includegraphics[width=0.8\linewidth]{images/esm3_sequences_umap.png}
+\captionof{figure}{UMAP plot of ESM-3 generated sequences (colored by sequence identity) and natural sequences (gray) (Figure from Hayes et al. 2024).}
+\label{fig:esm3_sequences_umap}
+\end{minipage}
+
+As shown in Figure \ref{fig:common_mechanism_ai_detection}, the AI detection module could be an additional step after the pathogen detection.
+This may help prevent AI-dependent evasion of screening, as sequences flagged as AI-generated would be subject to additional scrutiny within the decision-making framework and/or manual investigation.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{images/common_mechanism_ai.png}
+\caption{Integration of AI detection module into the Common Mechanism (adapted from IBBIS 2024).}
+\label{fig:common_mechanism_ai_detection}
+\end{figure}
+
+### Discussion
+
+Reliable detection of AI-generated protein sequences would be valuable not only for DNA synthesis screening but also for other biosecurity applications, such as early pathogen detection and genetic engineering detection.
+By addressing these challenges and integrating AI detection into the Common Mechanism, we can enhance our ability to identify potential biosecurity risks and stay ahead of emerging threats in synthetic biology.
+
+\newpage
+
+<!--
+## My suggestion for improvement
+
+For my suggestion for improvement, I would like to build on the second suggestion from Wheeler et al. 2024, of focusing on responding to advances in deep learning methods to improve identification of sequences of concern.
+Specefically, I propose that the Common Mechanism should include an additional analysis module that detects if a sequence is AI generated.
+
+Applications
+- Novel problem/nascent field but with methods from other fields e.g. ML than can be applied
+- DNA synthesis screening e.g. detecting sequences that may have been generated by AI to evade screening
+- Useful for other biosecurity applications, e.g. early detection of pathogens and genetic engineering detection
+
+Background
+- Methods for protein design using AI
+    - Transformers-based models (LLMs) e.g. ESM-3
+    - Diffusion models e.g. RF Diffusion (uses structural data) and EvoDiff (uses sequence data only)
+
+Methods
+- Binary classification task
+- Watermarking vs Post-hoc detection (https://arxiv.org/pdf/2403.01152)
+- Post-hoc detection
+    - Supervised detectors: Classifier trained on a dataset of AI-generated sequences and non-AI generated sequences
+        - Generate dataset
+- Two approaches to Post-hoc detection
+    1. Features
+        - Stylometry
+        - Structural
+        - Sequence
+    2. LLM probability function: - Use deep learning methods, e.g. LLMs model themselves mask tokens (amino acids) and predict the likelihood of the masked token across the sequence
+        - Fine-tune existing LLMs for this task
+- Look to methods in genetic engineering detection, similar to problem of pathogen detection
+
+Integration into the Common Mechanism
+- Include as an additional check after the benign gene identification module
+- If flagged as AI-generated, the sequence should be flagged as a sequence of concern
+- Would also be useful for manual investigation of sequences
+
+Challenges
+- Feasibility of this approach - to what extent AI-generated sequences different from naturally occurring sequences?
+    - Can you generalise across different models?
+- Keep up to date with advances in AI
+- Potential for false positives and negatives
+- High computational cost of LLM inference
+- Computational cost of running this module
+
 ## My suggestion for improvement
 
 While the above suggestions are crucial for reducing misuse risks associated with DNA synthesis, I propose an additional, more fundamental, area for improvement.
 
 \begin{minipage}{0.5\textwidth}
-To illustrate, consider DNA synthesis screening as fences preventing access to a hazardous area. Different companies own parts of the land surrounding this area, and many, including IGSC members, have erected fences. However, gaps exist where some companies perform no screening. As non-IGSC companies are known, these gaps are visible to potential bad actors.
+To illustrate, consider DNA synthesis screening as fences preventing access to a hazardous area.
+Different companies own parts of the land surrounding this area, and many, including IGSC members, have erected fences.
+However, gaps exist where some companies perform no screening. As non-IGSC companies are known, these gaps are visible to potential bad actors.
 \end{minipage}
 \hfill
 \begin{minipage}{0.45\textwidth}
@@ -328,5 +473,7 @@ Strategies to achieve this could include:
 6. **Incentives**: Provide motivation for adoption through financial incentives, recognition, or regulation.
 
 I am not aware of the existing work in this area but by focusing on widespread adoption, we can establish a more comprehensive baseline for DNA synthesis screening, significantly reducing potential misuse risks while building on the valuable suggestions for expansion proposed by Wheeler et al.
+
+-->
 
 # References
